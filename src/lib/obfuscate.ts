@@ -6,16 +6,7 @@ export const ASSET_FOLDERS = ["scramjet"] as const;
 
 export const ASSET_FILES = ["scramjet.all", "scramjet.sync", "scramjet.wasm", "scramjet.bundle"] as const;
 
-export const CLASSES = [
-  "browser-container",
-  "tab-button",
-  "address-bar",
-  "iframe-container",
-  "settings-card",
-  "settings-grid",
-  "proxy-frame",
-  "search-box",
-] as const;
+export const CLASSES = ["browser-container", "tab-button", "address-bar", "iframe-container", "settings-card", "settings-grid", "proxy-frame", "search-box"] as const;
 
 export const IDS = ["search", "main-content", "proxy-iframe", "browser-frame", "nav-menu", "menu-toggle", "menu-icon", "close-icon", "nav-links", "nav-style", "ab-toggle", "AB", "ab-switch", "ab-knob"] as const;
 
@@ -28,6 +19,7 @@ export interface ObfuscationMaps {
   assets: Record<string, string>;
   reverseAssets: Record<string, string>;
   version: string;
+  textKey: number;
 }
 
 function genRandom(length: number, used: Set<string>): string {
@@ -84,7 +76,8 @@ export function generateMaps(): ObfuscationMaps {
   }
 
   const version = crypto.randomBytes(8).toString("hex");
-  return { routes, reverseRoutes, code, assets, reverseAssets, version };
+  const textKey = (crypto.randomBytes(1)[0] | 1) & 0xff;
+  return { routes, reverseRoutes, code, assets, reverseAssets, version, textKey };
 }
 
 export function transformHtml(html: string, maps: ObfuscationMaps): string {
@@ -175,9 +168,7 @@ export function transformJs(js: string, maps: ObfuscationMaps): string {
       result = result.replaceAll(`'#${original}'`, `'#${obfuscated}'`);
       result = result.replaceAll(`"#${original}"`, `"#${obfuscated}"`);
       const idRegex = new RegExp(`getElementById\\((['\`])${escapeRegex(original)}\\1\\)`, "g");
-      result = result.replace(idRegex, `getElementById("${
-        obfuscated
-      }")`);
+      result = result.replace(idRegex, `getElementById("${obfuscated}")`);
     }
   }
 
