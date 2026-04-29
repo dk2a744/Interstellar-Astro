@@ -1,14 +1,9 @@
 import { execFileSync } from "node:child_process";
 import path from "node:path";
-import node from "@astrojs/node";
 import react from "@astrojs/react";
 import tailwind from "@astrojs/tailwind";
-import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
-import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
-import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 import compress from "@playform/compress";
 import { defineConfig } from "astro/config";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 import INConfig from "./config";
 
 const integrations = [react(), tailwind({ applyBaseStyles: false })];
@@ -27,10 +22,8 @@ if (INConfig.server?.compress !== false) {
 }
 
 export default defineConfig({
-  output: "server",
-  adapter: node({
-    mode: "middleware",
-  }),
+  output: "static",
+  base: "/Interstellar-Astro/",
   integrations,
   prefetch: {
     defaultStrategy: "viewport",
@@ -66,29 +59,5 @@ export default defineConfig({
         "@": path.resolve("./src"),
       },
     },
-    plugins: [
-      {
-        name: "vite-wisp-server",
-        configureServer(server) {
-          server.httpServer?.on("upgrade", (req, socket, head) => (req.url?.startsWith("/f") ? wisp.routeRequest(req, socket, head) : undefined));
-        },
-      },
-      viteStaticCopy({
-        targets: [
-          {
-            src: `${epoxyPath}/**/*.mjs`.replace(/\\/g, "/"),
-            dest: "assets/bundled",
-            overwrite: false,
-            rename: (name) => `ex-${name}.mjs`,
-          },
-          {
-            src: `${baremuxPath}/**/*.js`.replace(/\\/g, "/"),
-            dest: "assets/bundled",
-            overwrite: false,
-            rename: (name) => `bm-${name}.js`,
-          },
-        ],
-      }),
-    ],
   },
 });

@@ -13,7 +13,6 @@ import User from "lucide-astro/User";
 import type { Asset } from "@/lib/assets.ts";
 
 const { asset, assetType } = Astro.props;
-export const prerender = false;
 ---
 
 <div data-asset={JSON.stringify(asset)} data-asset-card class="group relative cursor-pointer" role="button" tabindex="0">

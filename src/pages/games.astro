@@ -7,8 +7,6 @@ import AssetCard from "@/components/AssetCard.astro";
 import Layout from "@/layouts/Main.astro";
 import { type Asset, parseAssetCookie } from "@/lib/assets.ts";
 
-export const prerender = false;
-
 const local = path.resolve("./public/assets/json/Games.json");
 
 let games: Asset[];
